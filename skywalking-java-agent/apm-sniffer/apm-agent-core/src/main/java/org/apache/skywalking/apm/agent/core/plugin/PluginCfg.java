@@ -52,6 +52,7 @@ public enum PluginCfg {
                     LOGGER.error(e, "Failed to format plugin({}) define.", pluginDefine);
                 }
             }
+            //剔除配置文件中不需要启动的插件
             pluginClassList = pluginSelector.select(pluginClassList);
         } finally {
             input.close();

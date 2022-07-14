@@ -40,6 +40,10 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
  * AbstractClassEnhancePluginDefine} list.
  */
 public class PluginFinder {
+    /**
+     * 为什么这里的Map泛型是List?
+     * 因为对同一个类，有可能有多个类对它进行字节码增强 key:目标类 value:字节码增强类
+     */
     private final Map<String, LinkedList<AbstractClassEnhancePluginDefine>> nameMatchDefine = new HashMap<String, LinkedList<AbstractClassEnhancePluginDefine>>();
     private final List<AbstractClassEnhancePluginDefine> signatureMatchDefine = new ArrayList<AbstractClassEnhancePluginDefine>();
     private final List<AbstractClassEnhancePluginDefine> bootstrapClassMatchDefine = new ArrayList<AbstractClassEnhancePluginDefine>();
@@ -57,19 +61,28 @@ public class PluginFinder {
                 LinkedList<AbstractClassEnhancePluginDefine> pluginDefines = nameMatchDefine.get(nameMatch.getClassName());
                 if (pluginDefines == null) {
                     pluginDefines = new LinkedList<AbstractClassEnhancePluginDefine>();
+                    //通过名称匹配
                     nameMatchDefine.put(nameMatch.getClassName(), pluginDefines);
                 }
                 pluginDefines.add(plugin);
             } else {
+                //间接匹配
                 signatureMatchDefine.add(plugin);
             }
-
+            //是否是JDK类库做字节码增强
             if (plugin.isBootstrapInstrumentation()) {
                 bootstrapClassMatchDefine.add(plugin);
             }
         }
     }
 
+    /**
+     * 查找所有可以多指定类型生效的插件
+     * 1.通过名称匹配
+     * 2.间接匹配
+     * @param typeDescription
+     * @return
+     */
     public List<AbstractClassEnhancePluginDefine> find(TypeDescription typeDescription) {
         List<AbstractClassEnhancePluginDefine> matchedPlugins = new LinkedList<AbstractClassEnhancePluginDefine>();
         String typeName = typeDescription.getTypeName();
@@ -87,6 +100,10 @@ public class PluginFinder {
         return matchedPlugins;
     }
 
+    /**
+     * 构造一个巨大的条件
+     * @return
+     */
     public ElementMatcher<? super TypeDescription> buildMatch() {
         ElementMatcher.Junction judge = new AbstractJunction<NamedElement>() {
             @Override

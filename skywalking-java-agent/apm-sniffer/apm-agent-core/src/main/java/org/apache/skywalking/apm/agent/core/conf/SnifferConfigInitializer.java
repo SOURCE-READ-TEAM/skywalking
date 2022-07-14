@@ -93,15 +93,19 @@ public class SnifferConfigInitializer {
 
         initializeConfig(Config.class);
         // reconfigure logger after config initialization
+        //根据配置重新指定日志解析器
         configureLogger();
         LOGGER = LogManager.getLogger(SnifferConfigInitializer.class);
-
+        //校验SERVICE_NAME是否为空
         if (StringUtil.isEmpty(Config.Agent.SERVICE_NAME)) {
             throw new ExceptionInInitializerError("`agent.service_name` is missing.");
         }
+        //校验BACKEND_SERVICE是否为空
         if (StringUtil.isEmpty(Config.Collector.BACKEND_SERVICE)) {
             throw new ExceptionInInitializerError("`collector.backend_service` is missing.");
         }
+        //如果 一个应用 application ---> redis
+        //PEER redis 地址
         if (Config.Plugin.PEER_MAX_LENGTH <= 3) {
             LOGGER.warn(
                 "PEER_MAX_LENGTH configuration:{} error, the default value of 200 will be used.",

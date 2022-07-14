@@ -65,6 +65,7 @@ public class SkyWalkingAgent {
     public static void premain(String agentArgs, Instrumentation instrumentation) throws PluginException {
         final PluginFinder pluginFinder;
         try {
+            //初始化配置
             SnifferConfigInitializer.initializeCoreConfig(agentArgs);
         } catch (Exception e) {
             // try to resolve a new logger, and use the new logger to write the error log here
@@ -77,6 +78,7 @@ public class SkyWalkingAgent {
         }
 
         try {
+            //加载插件并分类
             pluginFinder = new PluginFinder(new PluginBootstrap().loadPlugins());
         } catch (AgentPackageNotFoundException ape) {
             LOGGER.error(ape, "Locate agent.jar failure. Shutting down.");
@@ -86,8 +88,10 @@ public class SkyWalkingAgent {
             return;
         }
 
+        //创建 byteBuddy 的实例
         final ByteBuddy byteBuddy = new ByteBuddy().with(TypeValidation.of(Config.Agent.IS_OPEN_DEBUGGING_CLASS));
 
+        //指定byteBuddy 要忽略的类
         AgentBuilder agentBuilder = new AgentBuilder.Default(byteBuddy).ignore(
                 nameStartsWith("net.bytebuddy.")
                         .or(nameStartsWith("org.slf4j."))
@@ -97,6 +101,7 @@ public class SkyWalkingAgent {
                         .or(nameContains(".reflectasm."))
                         .or(nameStartsWith("sun.reflect"))
                         .or(allSkyWalkingAgentExcludeToolkit())
+                        //java 编译器动态生成的类
                         .or(ElementMatchers.isSynthetic()));
 
         JDK9ModuleExporter.EdgeClasses edgeClasses = new JDK9ModuleExporter.EdgeClasses();
@@ -108,12 +113,14 @@ public class SkyWalkingAgent {
         }
 
         try {
+            //解决JDK模块中的跨模块访问问题
             agentBuilder = JDK9ModuleExporter.openReadEdge(instrumentation, agentBuilder, edgeClasses);
         } catch (Exception e) {
             LOGGER.error(e, "SkyWalking agent open read edge in JDK 9+ failure. Shutting down.");
             return;
         }
 
+        //是否将修改后的字节码保存到内存/磁盘中
         if (Config.Agent.IS_CACHE_ENHANCED_CLASS) {
             try {
                 agentBuilder = agentBuilder.with(new CacheableTransformerDecorator(Config.Agent.CLASS_CACHE_MODE));
@@ -123,8 +130,10 @@ public class SkyWalkingAgent {
             }
         }
 
+        //指定byteBuddy 要拦截的类
         agentBuilder.type(pluginFinder.buildMatch())
                     .transform(new Transformer(pluginFinder))
+                    // redefinition 和 retransformation 的区别在于是否保留修改前的内容
                     .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                     .with(new RedefinitionListener())
                     .with(new Listener())

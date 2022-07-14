@@ -50,6 +50,7 @@ public class AgentClassLoader extends ClassLoader {
         /*
          * Try to solve the classloader dead lock. See https://github.com/apache/skywalking/pull/2016
          */
+        //开启类加载器的并行加载模式
         registerAsParallelCapable();
     }
 
@@ -86,6 +87,7 @@ public class AgentClassLoader extends ClassLoader {
         super(parent);
         File agentDictionary = AgentPackagePath.getPath();
         classpath = new LinkedList<>();
+        //设置类加载器的classpath: /config/activations 和 /config/plugins
         Config.Plugin.MOUNT.forEach(mountFolder -> classpath.add(new File(agentDictionary, mountFolder)));
     }
 
@@ -163,6 +165,7 @@ public class AgentClassLoader extends ClassLoader {
             // Set up the plugin config when loaded by class loader at the first time.
             // Agent class loader just loaded limited classes in the plugin jar(s), so the cost of this
             // isAssignableFrom would be also very limited.
+            //初始化自定义插件配置
             SnifferConfigInitializer.initializeConfig(pluginConfig.root());
         }
 
