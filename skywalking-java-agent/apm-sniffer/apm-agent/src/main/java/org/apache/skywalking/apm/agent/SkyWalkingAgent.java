@@ -132,6 +132,7 @@ public class SkyWalkingAgent {
 
         //指定byteBuddy 要拦截的类
         agentBuilder.type(pluginFinder.buildMatch())
+                    //插桩、字节码增强
                     .transform(new Transformer(pluginFinder))
                     // redefinition 和 retransformation 的区别在于是否保留修改前的内容
                     .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
@@ -157,9 +158,9 @@ public class SkyWalkingAgent {
         }
 
         @Override
-        public DynamicType.Builder<?> transform(final DynamicType.Builder<?> builder,
-                                                final TypeDescription typeDescription,
-                                                final ClassLoader classLoader,
+        public DynamicType.Builder<?> transform(final DynamicType.Builder<?> builder,//当前拦截到的类的字节码
+                                                final TypeDescription typeDescription,//当前拦截到的类的类型描述
+                                                final ClassLoader classLoader,//加载【当前拦截到的类】的类加载器
                                                 final JavaModule module) {
             LoadedLibraryCollector.registerURLClassLoader(classLoader);
             List<AbstractClassEnhancePluginDefine> pluginDefines = pluginFinder.find(typeDescription);
@@ -176,7 +177,7 @@ public class SkyWalkingAgent {
                 if (context.isEnhanced()) {
                     LOGGER.debug("Finish the prepare stage for {}.", typeDescription.getName());
                 }
-
+                //所有插件修改后的最终字节码
                 return newBuilder;
             }
 

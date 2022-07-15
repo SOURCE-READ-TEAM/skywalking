@@ -63,6 +63,7 @@ public enum ServiceManager {
         for (final BootService bootService : allServices) {
             Class<? extends BootService> bootServiceClass = bootService.getClass();
             boolean isDefaultImplementor = bootServiceClass.isAnnotationPresent(DefaultImplementor.class);
+            //有 @DefaultImplementor 注解
             if (isDefaultImplementor) {
                 if (!bootedServices.containsKey(bootServiceClass)) {
                     bootedServices.put(bootServiceClass, bootService);
@@ -71,6 +72,7 @@ public enum ServiceManager {
                 }
             } else {
                 OverrideImplementor overrideImplementor = bootServiceClass.getAnnotation(OverrideImplementor.class);
+                //既没有 @DefaultImplementor 注解也没有 @OverrideImplementor 注解
                 if (overrideImplementor == null) {
                     if (!bootedServices.containsKey(bootServiceClass)) {
                         bootedServices.put(bootServiceClass, bootService);
@@ -78,7 +80,9 @@ public enum ServiceManager {
                         throw new ServiceConflictException("Duplicate service define for :" + bootServiceClass);
                     }
                 } else {
+                    //没有 @DefaultImplementor 注解但是有 @OverrideImplementor 注解
                     Class<? extends BootService> targetService = overrideImplementor.value();
+                    //当前覆盖实现 要覆盖的 默认实现 已经被加载进来
                     if (bootedServices.containsKey(targetService)) {
                         boolean presentDefault = bootedServices.get(targetService)
                                                                .getClass()
@@ -90,6 +94,7 @@ public enum ServiceManager {
                                 "Service " + bootServiceClass + " overrides conflict, " + "exist more than one service want to override :" + targetService);
                         }
                     } else {
+                        //当前覆盖实现 要覆盖的 默认实现 还没有被加载进来，这时候就把这个覆盖实现就当做其服务的默认实现
                         bootedServices.put(targetService, bootService);
                     }
                 }

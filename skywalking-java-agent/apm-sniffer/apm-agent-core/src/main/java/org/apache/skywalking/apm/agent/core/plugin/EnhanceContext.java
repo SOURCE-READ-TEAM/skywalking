@@ -21,6 +21,7 @@ package org.apache.skywalking.apm.agent.core.plugin;
 import org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.ClassEnhancePluginDefine;
 
 /**
+ * 纪录当前被拦截的类是否被改了字节码，或者新增了字段、接口。
  * The <code>EnhanceContext</code> represents the context or status for processing a class.
  * <p>
  * Based on this context, the plugin core {@link ClassEnhancePluginDefine} knows how to process the specific steps for

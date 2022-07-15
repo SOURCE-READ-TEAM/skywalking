@@ -93,8 +93,10 @@ public abstract class AbstractClassEnhancePluginDefine {
         /**
          * find origin class source code for interceptor
          */
+        //字节码增强
         DynamicType.Builder<?> newClassBuilder = this.enhance(typeDescription, builder, classLoader, context);
 
+        //将纪录状态的上下文 isEnhanced=true
         context.initializationStageCompleted();
         LOGGER.debug("enhance class {} by {} completely.", transformClassName, interceptorDefineClassName);
 
