@@ -52,10 +52,12 @@ public final class GlobalIdGenerator {
     }
 
     private static class IDContext {
+        //上次生成 sequence 的时间戳
         private long lastTimestamp;
         private short threadSeq;
 
         // Just for considering time-shift-back only.
+        //时钟回拨
         private long lastShiftTimestamp;
         private int lastShiftValue;
 
@@ -71,6 +73,7 @@ public final class GlobalIdGenerator {
         private long timestamp() {
             long currentTimeMillis = System.currentTimeMillis();
 
+            //发生了时钟回拨
             if (currentTimeMillis < lastTimestamp) {
                 // Just for considering time-shift-back by Ops or OS. @hanahmily 's suggestion.
                 if (lastShiftTimestamp != currentTimeMillis) {

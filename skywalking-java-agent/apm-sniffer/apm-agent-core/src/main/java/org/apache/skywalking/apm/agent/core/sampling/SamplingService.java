@@ -47,7 +47,9 @@ public class SamplingService implements BootService {
     private static final ILog LOGGER = LogManager.getLogger(SamplingService.class);
 
     private volatile boolean on = false;
+    //用于3秒内的采样数量
     private volatile AtomicInteger samplingFactorHolder;
+    //每3秒重置采样数量
     private volatile ScheduledFuture<?> scheduledFuture;
 
     private SamplingRateWatcher samplingRateWatcher;
@@ -78,6 +80,8 @@ public class SamplingService implements BootService {
     }
 
     /**
+     * 如果采样没有开启，即on=false 则表示采集到的每一条链路都上传到OAP，否则，采样数量小于配置的采样数量，则上传到OAP，否则不上传到OAP
+     *
      * When the sampling mechanism is on and the sample limited is not reached, the trace segment
      * should be traced. If the sampling mechanism is off, it means that all trace segments should
      * be traced.

@@ -89,6 +89,10 @@ public class BootstrapInstrumentBoost {
         //所有要注入到bootstrap ClassLoader的类
         Map<String, byte[]> classesTypeMap = new HashMap<>();
 
+        /**
+         * 针对目标类是 JDK 核心类库的插件，这里根据插件的拦截点的不同的（实例方法、静态方法、构造方法）
+         * 使用不同的模板（xxxTemplate）来定义新的拦截器核心处理逻辑，并且将插件本身定义的全类名赋值给模板的 TARGET_INTERCEPTOR 字段
+         */
         if (!prepareJREInstrumentation(pluginFinder, classesTypeMap)) {
             return agentBuilder;
         }
@@ -247,6 +251,7 @@ public class BootstrapInstrumentBoost {
      */
     private static void generateDelegator(Map<String, byte[]> classesTypeMap, TypePool typePool,
         String templateClassName, String methodsInterceptor) {
+        //org.apache.skywalking.apm.plugin.jdk.http.HttpClientParseHttpInterceptor_internal
         String internalInterceptorName = internalDelegate(methodsInterceptor);
         try {
             TypeDescription templateTypeDescription = typePool.describe(templateClassName).resolve();

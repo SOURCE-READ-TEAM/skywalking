@@ -44,7 +44,9 @@ import org.apache.skywalking.apm.util.RunnableWithExceptionProtection;
 @DefaultImplementor
 public class JVMService implements BootService, Runnable {
     private static final ILog LOGGER = LogManager.getLogger(JVMService.class);
+    //收集JVM信息的定时任务
     private volatile ScheduledFuture<?> collectMetricFuture;
+    //发送JVM信息的定时任务
     private volatile ScheduledFuture<?> sendMetricFuture;
     private JVMMetricsSender sender;
 

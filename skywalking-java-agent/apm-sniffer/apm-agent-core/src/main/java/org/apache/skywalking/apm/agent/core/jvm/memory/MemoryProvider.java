@@ -39,9 +39,13 @@ public enum MemoryProvider {
         MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
         Memory.Builder heapMemoryBuilder = Memory.newBuilder();
         heapMemoryBuilder.setIsHeap(true);
+        //启动时向OS申请的内存大小
         heapMemoryBuilder.setInit(heapMemoryUsage.getInit());
+        //当前内存使用量
         heapMemoryBuilder.setUsed(heapMemoryUsage.getUsed());
+        //实际已经分配的内存
         heapMemoryBuilder.setCommitted(heapMemoryUsage.getCommitted());
+        //最大可用内存
         heapMemoryBuilder.setMax(heapMemoryUsage.getMax());
         memoryList.add(heapMemoryBuilder.build());
 

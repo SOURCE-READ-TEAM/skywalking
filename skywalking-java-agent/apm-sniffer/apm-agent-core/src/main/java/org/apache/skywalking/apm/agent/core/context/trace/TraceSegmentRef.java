@@ -67,6 +67,10 @@ public class TraceSegmentRef {
         this.parentEndpoint = snapshot.getParentEndpoint();
     }
 
+    /**
+     * 将java 对象序列化为 protobuf 对象
+     * @return
+     */
     public SegmentReference transform() {
         SegmentReference.Builder refBuilder = SegmentReference.newBuilder();
         if (SegmentRefType.CROSS_PROCESS.equals(type)) {

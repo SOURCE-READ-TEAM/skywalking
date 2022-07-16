@@ -22,6 +22,7 @@ import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 
 public class SunCpuAccessor extends CPUMetricsAccessor {
+    //OperatingSystemMXBean 基本只出现在OpenJdk 及其衍生版本中
     private final OperatingSystemMXBean osMBean;
 
     public SunCpuAccessor(int cpuCoreNum) {

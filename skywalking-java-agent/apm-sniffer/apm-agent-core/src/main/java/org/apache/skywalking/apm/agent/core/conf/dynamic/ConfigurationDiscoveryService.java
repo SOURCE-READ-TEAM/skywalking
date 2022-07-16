@@ -62,6 +62,7 @@ public class ConfigurationDiscoveryService implements BootService, GRPCChannelLi
     private String uuid;
     private final Register register = new Register();
 
+    //上一次计算的Watcher数量
     private volatile int lastRegisterWatcherSize;
 
     private volatile ScheduledFuture<?> getDynamicConfigurationFuture;

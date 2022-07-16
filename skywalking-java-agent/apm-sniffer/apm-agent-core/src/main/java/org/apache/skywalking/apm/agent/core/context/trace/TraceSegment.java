@@ -57,7 +57,7 @@ public class TraceSegment {
      * element, because only one parent {@link TraceSegment} exists, but, in batch scenario, the num becomes greater
      * than 1, also meaning multi-parents {@link TraceSegment}. But we only related the first parent TraceSegment.
      */
-    private DistributedTraceId relatedGlobalTraceId;
+    private DistributedTraceId relatedGlobalTraceId;//当前 Segment 所在的 traceId
 
     private boolean ignore = false;
 

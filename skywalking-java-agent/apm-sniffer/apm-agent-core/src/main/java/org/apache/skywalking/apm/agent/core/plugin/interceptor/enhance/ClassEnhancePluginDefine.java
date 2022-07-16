@@ -187,8 +187,9 @@ public abstract class ClassEnhancePluginDefine extends AbstractClassEnhancePlugi
             if (StringUtil.isEmpty(interceptor)) {
                 throw new EnhanceException("no StaticMethodsAroundInterceptor define to enhance class " + enhanceOriginClassName);
             }
-
+            //要修改原方法入参
             if (staticMethodsInterceptPoint.isOverrideArgs()) {
+                //是否是JDK类库的类
                 if (isBootstrapInstrumentation()) {
                     newClassBuilder = newClassBuilder.method(isStatic().and(staticMethodsInterceptPoint.getMethodsMatcher()))
                                                      .intercept(MethodDelegation.withDefaultConfiguration()

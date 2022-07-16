@@ -34,6 +34,9 @@ import org.apache.skywalking.apm.network.trace.component.command.CommandDeserial
 import org.apache.skywalking.apm.network.trace.component.command.UnsupportedCommandException;
 import org.apache.skywalking.apm.util.RunnableWithExceptionProtection;
 
+/**
+ * 收集OAP返回的Command 并交给CommandExecutorService处理
+ */
 @DefaultImplementor
 public class CommandService implements BootService, Runnable {
 
@@ -57,6 +60,9 @@ public class CommandService implements BootService, Runnable {
         );
     }
 
+    /**
+     * 不断从命令队列取出交给执行器执行命令
+     */
     @Override
     public void run() {
         final CommandExecutorService commandExecutorService = ServiceManager.INSTANCE.findService(CommandExecutorService.class);
@@ -64,7 +70,7 @@ public class CommandService implements BootService, Runnable {
         while (isRunning) {
             try {
                 BaseCommand command = commands.take();
-
+                //同一个命令不要重复执行
                 if (isCommandExecuted(command)) {
                     continue;
                 }

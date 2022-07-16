@@ -45,17 +45,25 @@ import org.apache.skywalking.apm.util.StringUtil;
 
 import static org.apache.skywalking.apm.agent.core.conf.Config.Collector.IS_RESOLVE_DNS_PERIODICALLY;
 
+/**
+ * agent => grpc 的连接大动脉
+ */
 @DefaultImplementor
 public class GRPCChannelManager implements BootService, Runnable {
     private static final ILog LOGGER = LogManager.getLogger(GRPCChannelManager.class);
 
     private volatile GRPCChannel managedChannel = null;
+    //网络连接状态检查定时器
     private volatile ScheduledFuture<?> connectCheckFuture;
+    //当前网络连接是否需要重连
     private volatile boolean reconnect = true;
     private final Random random = new Random();
     private final List<GRPCChannelListener> listeners = Collections.synchronizedList(new LinkedList<>());
+    //OAP 地址列表
     private volatile List<String> grpcServers;
+    //上次选择的OAP地址下标
     private volatile int selectedIdx = -1;
+    //网络重连次数
     private volatile int reconnectCount = 0;
 
     @Override
@@ -65,6 +73,7 @@ public class GRPCChannelManager implements BootService, Runnable {
 
     @Override
     public void boot() {
+        //检查OAP 地址
         if (Config.Collector.BACKEND_SERVICE.trim().length() == 0) {
             LOGGER.error("Collector server addresses are not set.");
             LOGGER.error("Agent will not uplink any data.");
@@ -113,6 +122,7 @@ public class GRPCChannelManager implements BootService, Runnable {
                     })
                     .flatMap(domainPortPairs -> {
                         try {
+                            //获取 domain 的所有IP地址
                             return Arrays.stream(InetAddress.getAllByName(domainPortPairs[0]))
                                     .map(InetAddress::getHostAddress)
                                     .map(ip -> String.format("%s:%s", ip, domainPortPairs[1]));

@@ -61,6 +61,7 @@ public class LoadedLibraryCollector {
         List<KeyStringValuePair> jvmInfo = new ArrayList<>();
         jvmInfo.add(KeyStringValuePair.newBuilder().setKey("Start Time").setValue(getVmStartTime()).build());
         jvmInfo.add(KeyStringValuePair.newBuilder().setKey("JVM Arguments").setValue(GSON.toJson(getVmArgs())).build());
+        //获取所有的第三方依赖
         List<String> libJarNames = getLibJarNames();
         jvmInfo.add(KeyStringValuePair.newBuilder().setKey("Jar Dependencies").setValue(GSON.toJson(libJarNames)).build());
         return jvmInfo;

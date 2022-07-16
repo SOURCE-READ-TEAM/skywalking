@@ -31,11 +31,13 @@ import org.apache.skywalking.apm.network.trace.component.ComponentsDefine;
 public interface AbstractSpan extends AsyncSpan {
     /**
      * Set the component id, which defines in {@link ComponentsDefine}
+     * 指定当前span发生在那个插件上
      *
      * @return the span for chaining.
      */
     AbstractSpan setComponent(Component component);
 
+    //指定当前span的操作所在的插件属于哪种类型（skywalking定义的类型）
     AbstractSpan setLayer(SpanLayer layer);
 
     /**

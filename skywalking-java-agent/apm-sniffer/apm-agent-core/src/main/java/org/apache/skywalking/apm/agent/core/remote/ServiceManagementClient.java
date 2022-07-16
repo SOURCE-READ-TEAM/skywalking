@@ -44,20 +44,31 @@ import org.apache.skywalking.apm.util.RunnableWithExceptionProtection;
 
 import static org.apache.skywalking.apm.agent.core.conf.Config.Collector.GRPC_UPSTREAM_TIMEOUT;
 
+/**
+ * 自报家门
+ *
+ * 1. 将当前 Agent Client 的基本信息 汇报给 OAP
+ * 2. 和OAP保持心跳
+ */
 @DefaultImplementor
 public class ServiceManagementClient implements BootService, Runnable, GRPCChannelListener {
     private static final ILog LOGGER = LogManager.getLogger(ServiceManagementClient.class);
     private static List<KeyStringValuePair> SERVICE_INSTANCE_PROPERTIES;
 
+    //当前网络连接状态
     private volatile GRPCChannelStatus status = GRPCChannelStatus.DISCONNECT;
     private volatile ManagementServiceGrpc.ManagementServiceBlockingStub managementServiceBlockingStub;
+    //心跳定时任务
     private volatile ScheduledFuture<?> heartbeatFuture;
+    //Agent Client 数据发送计数器
     private volatile AtomicInteger sendPropertiesCounter = new AtomicInteger(0);
 
     @Override
     public void statusChanged(GRPCChannelStatus status) {
         if (GRPCChannelStatus.CONNECTED.equals(status)) {
+            //找到服务，拿到网络连接
             Channel channel = ServiceManager.INSTANCE.findService(GRPCChannelManager.class).getChannel();
+            //grpc 的 stub 就是 在protobuf 中定义的service
             managementServiceBlockingStub = ManagementServiceGrpc.newBlockingStub(channel);
         } else {
             managementServiceBlockingStub = null;
@@ -68,7 +79,7 @@ public class ServiceManagementClient implements BootService, Runnable, GRPCChann
     @Override
     public void prepare() {
         ServiceManager.INSTANCE.findService(GRPCChannelManager.class).addChannelListener(this);
-
+        //把配置文件中的 Agent Client 属性放到一个集合中
         SERVICE_INSTANCE_PROPERTIES = InstanceJsonPropertiesUtil.parseProperties();
     }
 
@@ -101,6 +112,9 @@ public class ServiceManagementClient implements BootService, Runnable, GRPCChann
         if (GRPCChannelStatus.CONNECTED.equals(status)) {
             try {
                 if (managementServiceBlockingStub != null) {
+                    //心跳周期30秒 信息汇报因子10  => 每5分钟向OAP 汇报一次 Agent Client Properties
+                    //Round=1 ; counter =0 0%10=0
+                    //Round=2 ; counter =1 1%10=1!=0
                     if (Math.abs(
                         sendPropertiesCounter.getAndAdd(1)) % Config.Collector.PROPERTIES_REPORT_PERIOD_FACTOR == 0) {
 

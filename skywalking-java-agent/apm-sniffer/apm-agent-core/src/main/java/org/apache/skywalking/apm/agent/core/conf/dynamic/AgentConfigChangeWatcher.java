@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public abstract class AgentConfigChangeWatcher {
     // Config key, should match KEY in the Table of Agent Configuration Properties.
+    //propertyKey来源于 agent.config 也就是agent 配置文件中合法的key
     private final String propertyKey;
 
     public AgentConfigChangeWatcher(String propertyKey) {
