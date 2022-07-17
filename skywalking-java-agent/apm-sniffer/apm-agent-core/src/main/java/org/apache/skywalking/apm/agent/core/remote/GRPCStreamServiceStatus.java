@@ -42,6 +42,7 @@ public class GRPCStreamServiceStatus {
      */
     public void wait4Finish() {
         long recheckCycle = 5;
+        //已等待的毫秒数
         long hasWaited = 0L;
         long maxCycle = 30 * 1000L; // 30 seconds max.
         while (!status) {

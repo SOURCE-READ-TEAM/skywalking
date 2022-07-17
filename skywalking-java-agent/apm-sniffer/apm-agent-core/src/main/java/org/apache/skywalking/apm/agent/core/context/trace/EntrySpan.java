@@ -43,6 +43,7 @@ public class EntrySpan extends StackBasedTracingSpan {
 
     /**
      * Set the {@link #startTime}, when the first start, which means the first service provided.
+     * EntrySpan只会由第一个插件创建，但是后面的插件都会调用一次start();
      */
     @Override
     public EntrySpan start() {

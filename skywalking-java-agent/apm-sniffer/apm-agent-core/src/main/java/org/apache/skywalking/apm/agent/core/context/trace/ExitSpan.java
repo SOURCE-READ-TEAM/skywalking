@@ -33,6 +33,9 @@ import org.apache.skywalking.apm.network.trace.component.Component;
  * <p>
  * Such as: Dubbox - Apache Httpcomponent - ...(Remote) The <code>ExitSpan</code> represents the Dubbox span, and ignore
  * the httpcomponent span's info.
+ * 区别：
+ *      EntrySpan：更靠近于服务端
+ *      ExitSpan：更靠近于消费端
  */
 public class ExitSpan extends StackBasedTracingSpan implements ExitTypeSpan {
 

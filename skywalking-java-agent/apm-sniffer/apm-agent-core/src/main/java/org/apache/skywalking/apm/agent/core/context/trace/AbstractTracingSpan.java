@@ -55,10 +55,12 @@ public abstract class AbstractTracingSpan implements AbstractSpan {
     protected SpanLayer layer;
     /**
      * The span has been tagged in async mode, required async stop to finish.
+     * 当前异步操作是否开启
      */
     protected volatile boolean isInAsyncMode = false;
     /**
      * The flag represents whether the span has been async stopped
+     * 当前异步操作是否结束
      */
     private volatile boolean isAsyncStopped = false;
 
